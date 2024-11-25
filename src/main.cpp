@@ -67,18 +67,17 @@ int main(int argc, char* argv[])
 
     auto f_print = [](const auto& data){ std::cout << data.value() << ' '; };
 
-    in_order(root, [](const auto& data){ std::cout << data.value() << ' '; });
-    std::cout << '\n';
-    // in_order(&tree, print_one_more); std::cout << '\n';
-    pre_order(root, f_print);   std::cout << '\n';
-    post_order(root, f_print);  std::cout << '\n';
-    level_order(root, f_print); std::cout << '\n';
+    std::cout << "In    Order: "; in_order(root, f_print);    std::cout << '\n';
+    std::cout << "Pre   Order: "; pre_order(root, f_print);   std::cout << '\n';
+    std::cout << "Post  Order: "; post_order(root, f_print);  std::cout << '\n';
+    std::cout << "Level Order: "; level_order(root, f_print); std::cout << '\n';
 
     // Just a test that traversal can handle an empty tree.
     // Node<double>* t { nullptr };
     // in_order(t, f_print);
 
     std::cout << "HEIGHT: " << tree::height(root) << '\n';
+    std::cout << "NODES: "  << tree::count_nodes(root) << '\n';
 
     std::cout << std::boolalpha
               << "FULL: "     << tree::is_full(root)     << '\n'
