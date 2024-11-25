@@ -105,7 +105,6 @@ size_t height(const Node<T>* root)
     size_t height_left  { height(root->left_)  };
     size_t height_right { height(root->right_) };
     return std::max(height_left, height_right) + 1;
-    // TO DO: Should the + 1 be here?
 }
 
 template<typename T>
