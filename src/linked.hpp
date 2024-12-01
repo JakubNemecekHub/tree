@@ -161,6 +161,7 @@ void post_order(const Node<T>* root, F fnc)
 template<typename T, typename F>
 void level_order(const Node<T>* root, F fnc)
 {
+    if ( root == nullptr ) return;
     std::queue<const Node<T>*> q;
     q.push(root);
     while ( !q.empty() )
@@ -231,6 +232,7 @@ bool is_perfect(const Node<T>* node, size_t level = 0)
 template<typename T>
 bool is_balanced(const Node<T>* node)
 {
+    if ( node == nullptr ) return true;
     std::queue<const Node<T>*> q;
     q.push(node);
     while ( !q.empty() )
