@@ -65,6 +65,8 @@ public:
     template<typename K> friend bool is_perfect(const Node<K>*, size_t);
     template<typename K> friend bool is_balanced(const Node<K>*);
 
+    template<typename K> friend Node<K>* search(Node<K>*, K);
+
 };
 
 // Serialization
@@ -248,6 +250,23 @@ bool is_balanced(const Node<T>* node)
         if ( it->right_ != nullptr ) q.push(it->right_);
     }
     return true;
+}
+
+template<typename T>
+Node<T>* search(Node<T>* node, T key)
+{
+    if ( node == nullptr ) return nullptr;
+    std::queue<Node<T>*> q;
+    q.push(node);
+    while ( !q.empty() )
+    {
+        Node<T>* it { q.front() };
+        q.pop();
+        if ( it->data.value() == key ) return it;
+        if ( it->left_ != nullptr )  q.push(it->left_);
+        if ( it->right_ != nullptr ) q.push(it->right_);
+    }
+    return nullptr;
 }
 
 }  // namespace tree
