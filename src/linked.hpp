@@ -3,6 +3,8 @@
 #include <optional>
 #include <queue>
 #include <functional>
+#include <memory>
+#include <concepts>
 
 namespace tree
 {
@@ -12,67 +14,98 @@ class Node
 {
 private:
 
-    Node* right_ { nullptr };
-    Node* left_  { nullptr };
+    std::unique_ptr<Node<T>> right_ { nullptr };
+    std::unique_ptr<Node<T>> left_  { nullptr };
 
 public:
 
     std::optional<T> data { std::nullopt };
 
-    Node() {}
-    Node(T data_) : data {data_} {}
-    Node(T data_, Node* right, Node* left)
-        : data {data_}, right_{right}, left_{left} {}
-
-    void right(Node* child) { right_ = child; }
-    Node* right(T data)
+    Node(std::optional<T> data_) : data {data_} {}
+    template<typename... Args>
+    Node(Args&&... args)
     {
-        right_ = new Node<T>(data);
+        data.emplace(std::forward<Args>(args)...);
+    };
+    Node() = default;
+
+    void right(Node* child) { right_ = std::unique_ptr<Node<T>>(child); }
+    void right(std::unique_ptr<Node<T>> child)
+    {
+        right_ = std::move(child);
+    }
+    std::unique_ptr<Node<T>>& right(T data)
+    {
+        right_ = std::make_unique<Node<T>>(data);
         return right_;
     }
-    Node* right() const { return right_; }
-    void left(Node* child) { left_ = child; }
-    Node* left(T data)
+    template<typename... Args>
+    requires (sizeof...(Args) > 0)
+    std::unique_ptr<Node<T>>& right(Args&&... args)
     {
-        left_ = new Node<T>(data);
+        right_ = std::make_unique<Node<T>>(args...);
+        return right_;
+    }
+    std::unique_ptr<Node<T>>& right() { return right_; }
+    std::unique_ptr<Node<T>> release_right() { return std::move(right_); }
+
+    void left(Node* child) { left_ = std::unique_ptr<Node<T>>(child); }
+    void left(std::unique_ptr<Node<T>> child)
+    {
+        left_ = std::move(child);
+    }
+    std::unique_ptr<Node<T>>& left(std::optional<T> data)
+    {
+        left_ = std::make_unique<Node<T>>(data);
         return left_;
     }
-    Node* left() const { return left_; }
+    template<typename... Args>
+    requires (
+        (sizeof...(Args) > 0) &&
+        !(sizeof...(Args) == 1 && std::same_as<std::tuple_element_t<0, std::tuple<Args...>>, std::unique_ptr<Node<T>>&>)
+        )
+    std::unique_ptr<Node<T>>& left(Args&&... args)
+    {
+        left_ = std::make_unique<Node<T>>(args...);
+        return left_;
+    }
+    std::unique_ptr<Node<T>>& left() { return left_; }
+    std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
 
     // Serialization
-    template<typename K> friend void serialize(const Node<K>*, std::ostream&);
+    template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
 
     // Height
     // Depth of a node -> HOW? Is it usefull on its own?
     // Path between two nodes?
 
-    template<typename K> friend size_t height(const Node<K>*);
-    template<typename K> friend size_t count_nodes(const Node<K>*);
+    template<typename K> friend size_t height(const std::unique_ptr<Node<K>>&);
+    template<typename K> friend size_t count_nodes(const std::unique_ptr<Node<K>>&);
 
     // Traversals
 
-    template<typename K> friend void print_tree(const Node<K>*, int);
+    template<typename K> friend void print(const std::unique_ptr<Node<K>>&, int);
 
-    template<typename K, typename F> friend void in_order(const Node<K>*, F);
-    template<typename K, typename F> friend void pre_order(const Node<K>*, F);
-    template<typename K, typename F> friend void post_order(const Node<K>*, F);
-    template<typename K, typename F> friend void level_order(const Node<K>*, F);
+    template<typename K, typename F> friend void in_order(const std::unique_ptr<Node<K>>&, F);
+    template<typename K, typename F> friend void pre_order(const std::unique_ptr<Node<K>>&, F);
+    template<typename K, typename F> friend void post_order(const std::unique_ptr<Node<K>>&, F);
+    template<typename K, typename F> friend void level_order(const std::unique_ptr<Node<K>>&, F);
 
     // Tree Type
 
-    template<typename K> friend bool is_full(const Node<K>*);
-    template<typename K> friend bool is_complete(const Node<K>*, size_t);
-    template<typename K> friend bool is_perfect(const Node<K>*, size_t);
-    template<typename K> friend bool is_balanced(const Node<K>*);
+    template<typename K> friend bool is_full(const std::unique_ptr<Node<K>>&);
+    template<typename K> friend bool is_complete(const std::unique_ptr<Node<K>>&, size_t);
+    template<typename K> friend bool is_perfect(const std::unique_ptr<Node<K>>&, size_t);
+    template<typename K> friend bool is_balanced(const std::unique_ptr<Node<K>>&);
 
-    template<typename K> friend Node<K>* search(Node<K>*, K);
+    template<typename K> friend std::optional<K> search(std::unique_ptr<Node<K>>&, K);
 
 };
 
 // Serialization
 
 template<typename T>
-void serialize(const Node<T>* root, std::ostream& out)
+void serialize(const std::unique_ptr<Node<T>>& root, std::ostream& out)
 {
     if ( root == nullptr ) {
         out << "# ";  // Use "#" to denote a null node
@@ -84,7 +117,7 @@ void serialize(const Node<T>* root, std::ostream& out)
 }
 
 template<typename T>
-Node<T>* deserialize(std::ifstream& in)
+std::unique_ptr<Node<T>> deserialize(std::ifstream& in)
 {
     std::string val;
     in >> val;
@@ -94,16 +127,15 @@ Node<T>* deserialize(std::ifstream& in)
     }
 
     T data = std::stoi(val);
-    Node<T>* node = new Node<T>(data);
+    auto node { std::make_unique<Node<T>>(data) };
     node->left(deserialize<T>(in));  // Rebuild left subtree
     node->right(deserialize<T>(in)); // Rebuild right subtree
-    return node;
+    return std::move(node);
 }
 
 // Height of the tree
-
 template<typename T>
-size_t height(const Node<T>* root)
+size_t height(const std::unique_ptr<Node<T>>& root)
 {
     if ( root == nullptr ) return 0;
     size_t height_left  { height(root->left_)  };
@@ -112,7 +144,7 @@ size_t height(const Node<T>* root)
 }
 
 template<typename T>
-size_t count_nodes(const Node<T>* node)
+size_t count_nodes(const std::unique_ptr<Node<T>>& node)
 {
     if ( node == nullptr ) return 0;
     return (count_nodes(node->left_) + count_nodes(node->right_) + 1);
@@ -120,12 +152,14 @@ size_t count_nodes(const Node<T>* node)
 
 // Recursive function to display the tree sideways
 template<typename T>
-void print_tree(const Node<T>* node, int depth = 0)
+void print(const std::unique_ptr<Node<T>>& node, int depth = 0)
 {
     if (node == nullptr) return;
-    print_tree(node->right_, depth + 1);
-    std::cout << std::string(4 * depth, ' ') << node->data.value() << std::endl;
-    print_tree(node->left_, depth + 1);
+    print(node->right_, depth + 1);
+    std::cout << std::string(4 * depth, ' ');
+    if ( node->data.has_value() ) std::cout << node->data.value();
+    std::cout << std::endl;
+    print(node->left_, depth + 1);
 }
 
 
@@ -134,7 +168,7 @@ void print_tree(const Node<T>* node, int depth = 0)
 // Traversals
 
 template<typename T, typename F>
-void in_order(const Node<T>* root, F fnc)
+void in_order(const std::unique_ptr<Node<T>>& root, F fnc)
 {
     if ( root == nullptr ) return;
     in_order(root->left_, fnc);
@@ -143,7 +177,7 @@ void in_order(const Node<T>* root, F fnc)
 }
 
 template<typename T, typename F>
-void pre_order(const Node<T>* root, F fnc)
+void pre_order(const std::unique_ptr<Node<T>>& root, F fnc)
 {
     if ( root == nullptr ) return;
     fnc(root->data);
@@ -152,7 +186,7 @@ void pre_order(const Node<T>* root, F fnc)
 }
 
 template<typename T, typename F>
-void post_order(const Node<T>* root, F fnc)
+void post_order(const std::unique_ptr<Node<T>>& root, F fnc)
 {
     if ( root == nullptr ) return;
     post_order(root->left_, fnc);
@@ -161,18 +195,18 @@ void post_order(const Node<T>* root, F fnc)
 }
 
 template<typename T, typename F>
-void level_order(const Node<T>* root, F fnc)
+void level_order(const std::unique_ptr<Node<T>>& root, F fnc)
 {
     if ( root == nullptr ) return;
     std::queue<const Node<T>*> q;
-    q.push(root);
+    q.push(root.get());
     while ( !q.empty() )
     {
         const Node<T>* it { q.front() };
         q.pop();
         fnc(it->data);
-        if ( it->left_ != nullptr )  q.push(it->left_);
-        if ( it->right_ != nullptr ) q.push(it->right_);
+        if ( it->left_ != nullptr )  q.push(it->left_.get());
+        if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
 }
 
@@ -184,7 +218,7 @@ void level_order(const Node<T>* root, F fnc)
     Alson known as a proper binary tree.
 */
 template<typename T>
-bool is_full(const Node<T>* node)
+bool is_full(const std::unique_ptr<Node<T>>& node)
 {
   if ( node == nullptr ) return true;
   if ( node->left_ == nullptr && node->right_ == nullptr ) return true;   // Base case
@@ -199,7 +233,7 @@ bool is_full(const Node<T>* node)
     filled and all nodes at the last level are as far as possible.
 */
 template<typename T>
-bool is_complete(const Node<T>* node, size_t index = 0)
+bool is_complete(const std::unique_ptr<Node<T>>& node, size_t index = 0)
 {
     static size_t node_count { count_nodes(node) };
     if ( node == nullptr ) return true;
@@ -214,7 +248,7 @@ bool is_complete(const Node<T>* node, size_t index = 0)
     Every perfect binary tree is full and perfect.
 */
 template<typename T>
-bool is_perfect(const Node<T>* node, size_t level = 0)
+bool is_perfect(const std::unique_ptr<Node<T>>& node, size_t level = 0)
 {
     static size_t tree_height { height(node) };
     if ( node == nullptr ) return true;
@@ -232,11 +266,11 @@ bool is_perfect(const Node<T>* node, size_t level = 0)
     The height of both subtrees of every node differs by at most 1.
 */
 template<typename T>
-bool is_balanced(const Node<T>* node)
+bool is_balanced(const std::unique_ptr<Node<T>>& node)
 {
     if ( node == nullptr ) return true;
     std::queue<const Node<T>*> q;
-    q.push(node);
+    q.push(node.get());
     while ( !q.empty() )
     {
         const Node<T>* it { q.front() };
@@ -246,27 +280,27 @@ bool is_balanced(const Node<T>* node)
         size_t height_right { height(it->right_) };
         if ( (height_left >= (height_right + 2)) || (height_right >= (height_left + 2)) ) return false;
 
-        if ( it->left_ != nullptr )  q.push(it->left_);
-        if ( it->right_ != nullptr ) q.push(it->right_);
+        if ( it->left_ != nullptr )  q.push(it->left_.get());
+        if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
     return true;
 }
 
 template<typename T>
-Node<T>* search(Node<T>* node, T key)
+std::optional<T> search(std::unique_ptr<Node<T>>& node, T key)
 {
-    if ( node == nullptr ) return nullptr;
+    if ( node == nullptr ) return std::nullopt;
     std::queue<Node<T>*> q;
-    q.push(node);
+    q.push(node.get());
     while ( !q.empty() )
     {
         Node<T>* it { q.front() };
         q.pop();
-        if ( it->data.value() == key ) return it;
-        if ( it->left_ != nullptr )  q.push(it->left_);
-        if ( it->right_ != nullptr ) q.push(it->right_);
+        if ( it->data.value() == key ) return it->data;
+        if ( it->left_ != nullptr ) q.push(it->left_.get());
+        if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 }  // namespace tree
