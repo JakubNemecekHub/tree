@@ -8,6 +8,93 @@ Two possible implementations:
 - Linked Node objects
 - Array
 
+## Terminology
+
+- Binary tree: The data structure itself. It's a speciall type of Tree data structure. Which itself is a special type of Graph data structure.
+- Node: The element of the tree. It holds data (either plain or with key) and has up to 2 children. In some implementations node also points back to its parent.
+- Parent
+- Child
+- Sibling: Nodes having the same parent are sibilngs.
+- Degree: Number of children of a node.
+- Edge
+- Path: A sequence of nodes n1, n2,...,nk such that ni is a parent of n(i+1) for 1 <= i <= k. **Length** of this path is k-1.
+- Ancestor and Descendant: There is a path between an ancestor and its descendants.
+- Depth: The length of a path from root to a node.
+- Height: The depth of the deepest node.
+- Level: All nodes of the same depth are said to be on the same level.
+- Internal node: A node that has at least one child.
+- Leaf node: A node with no children. Also refered to as external node.
+- Enumeration: A traversal that visits each node exactly once.
+
+## Traversals
+
+Example tree:
+```mermaid
+  graph TD;
+    1-->2;
+    1-->3;
+    2-->4;
+    2-->5;
+```
+
+### Recursive
+
+Best implemented using recursion. Base case: node if a leaf.
+
+| Name       | Scheme            | Example       |
+|------------|-------------------|---------------|
+| In-order   | Left, root, right | 4, 2, 5, 1, 3 |
+| Pre-order  | Root, left, right | 1, 2, 4, 5, 3 |
+| Post-order | Left, right, root | 4, 5, 2, 3, 1 |
+
+
+### Non-recursive
+
+Implementation usually does not use recursion. A queue is used to keep track of nodes and it's children.
+
+- Level-order: Level by level from left to right. Yields 1, 2, 3, 4, 5.
+
+## Tree types
+
+- `n` total numner of nodes
+- `ì` number of internal nodes
+- `l` number of leaves
+- `λ`number of levels (starting at 0)
+
+### Full Binary Tree
+
+Every parent has either 0 or 2 children. Also known as Proper Binary Tree.
+
+- `l = i + 1` or `l = 1/2(n + 1)`
+- `n = 2i + 1` or `n = 2l - 1`
+- `i = 1/2(n - 1)` or `i = l - 1`
+- `l` is at most `2 to the power of (λ - 1)`
+
+### Balanced Binary Tree
+
+The difference og height of left and right subtrees is less than one. And both subtrees of all nodes are balanced.
+
+The height of a balanced tree is and the number of nodes are logarithmically proportional.
+
+### Complete Binary Tree
+
+Every level, except possibly the last, is completely filled and all nodes at the last level are as far left as possible.
+
+Every complete tree is balanced.
+
+Complete Tree can be stored in array without empty spaces. For node at index `i` its left child as at `2i + 1` and its right child at `2i + 2`.
+
+| level | 0 | 1 | 1 | 2 | 2 | 2 | 2 | 3 | 3   |
+|-------|---|---|---|---|---|---|---|---|-----|
+| Index | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... |
+
+### Perfect Binary Tree
+
+All parents have exactly 2 children and all leaves are on the same level. Every perfect tree is full, complete and balanced.
+
+- `l = 2 to the power of λ`
+- `λ = log(n + 1) - 1`
+- `n = 2 to the power of (λ + 1) - 1`
 
 ## Data for testing purposes
 
@@ -17,3 +104,13 @@ Two possible implementations:
 |tree_2.tr | Example full tree     | 1 2 4 # # 5 6 # # 7 # # 3 # # |
 |tree_3.tr | Example perfect tree  | 1 2 4 # # 5 # # 3 6 # # 7 # # |
 |tree_4.tr | Example complete tree | 1 2 4 # # 5 # # 3 6 # # #     |
+
+# Huffmann Tree
+
+Not sure if this is the correct name. But it's the data structure wee need to use to implement Huffmann Encoding. In such a tree internal nodes do not hold data, only some sort of key, and provide structure to the tree. All usable data are stored in leaf nodes.
+
+# Binary Searhc Tree
+
+Elements in **BST** are ordered by a **key** value. This means that BST can only stores data that can be comapred using the **<=** operator.
+
+ All elements in node's left sub-tree are smaller and all elements in its right sub-tree are larger than key in the node.
