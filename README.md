@@ -23,7 +23,7 @@ Two possible implementations:
 - Height: The depth of the deepest node.
 - Level: All nodes of the same depth are said to be on the same level.
 - Internal node: A node that has at least one child.
-- Leaf node: A node with no children. Also refered to as external node.
+- Leaf node: A node with no children. Also referred to as external node.
 - Enumeration: A traversal that visits each node exactly once.
 
 ## Traversals
@@ -56,7 +56,7 @@ Implementation usually does not use recursion. A queue is used to keep track of 
 
 ## Tree types
 
-- `n` total numner of nodes
+- `n` total number of nodes
 - `ì` number of internal nodes
 - `l` number of leaves
 - `λ`number of levels (starting at 0)
@@ -109,8 +109,24 @@ All parents have exactly 2 children and all leaves are on the same level. Every 
 
 Not sure if this is the correct name. But it's the data structure wee need to use to implement Huffmann Encoding. In such a tree internal nodes do not hold data, only some sort of key, and provide structure to the tree. All usable data are stored in leaf nodes.
 
-# Binary Searhc Tree
+# Binary Search Tree
 
-Elements in **BST** are ordered by a **key** value. This means that BST can only stores data that can be comapred using the **<=** operator.
+Elements in **BST** are ordered by a **key** value. This means that BST can only stores data that can be compared using the **<** operator.
 
- All elements in node's left sub-tree are smaller and all elements in its right sub-tree are larger than key in the node.
+For classes that are to be stored in a tree, we can override the <=> operator. This operator is called *a spaceship* and is the preferred way of creating comparable classes.
+
+ All elements in node's left sub-tree are smaller equal than the element in the node. All elements in its right sub-tree are larger than key in the node.
+
+ In-order traversal traverses all the nodes in sorted order from smallest to largest.
+
+ ## Complexity
+
+ ## Sources
+
+ - [Wikipedia](https://en.wikipedia.org/wiki/Binary_search_tree)
+ - [Programiz](https://www.programiz.com/dsa/binary-search-tree)
+ - [OpenDSA](https://opendsa-server.cs.vt.edu/ODSA/Books/CS3/html/BST.html)
+
+ # AVL
+
+ A type of self-balancing binary search tree. Note that during the balancing act, the *binary search tree* property can be violated, if there are duplicated keys in the tree. (To demonstrate this situation, try, for example, inserting only one value into the AVL tree multiple times.) **Does this fact mean, that in-order traversal does not necessarily print ordered nodes from smallest to largest?**
