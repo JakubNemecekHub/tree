@@ -9,29 +9,24 @@ struct My_Data
     std::string name;
     My_Data() {};
     My_Data(int key_, std::string name_)
-        : key{key_}, name{name_}
-    {
-        std::cout << "Created " << name << ", age " << key << '\n';
-    }
+        : key{key_}, name{name_} {}
     My_Data(const My_Data& other)
     {
         this->key = other.key;
         this->name = other.name;
-        std::cout << "Copied " << this->name << ", age " << this->key << '\n';
     }
     My_Data(My_Data&& other)
-        : key{other.key}, name{std::move(other.name)}
-    {
-        std::cout << "Moved " << this->name << ", age " << this->key << '\n';
-    }
-    ~My_Data()
-    {
-        std::cout << "(" << name << ", " << key << ") is gone \n";
-    }
+        : key{other.key}, name{std::move(other.name)} {}
+    ~My_Data() {}
 
     auto operator<=>(const My_Data& other) const
     {
         return key <=> other.key;
     }
 };
+
+std::ostream& operator<<(std::ostream& os, const My_Data& obj)
+{
+    return os << "(" << obj.key << " " << obj.name << ")";
+}
 

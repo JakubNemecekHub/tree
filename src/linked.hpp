@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <fstream>
 #include <optional>
 #include <queue>
 #include <functional>
@@ -9,6 +11,14 @@
 namespace tree
 {
 
+enum class Parentage : int
+{
+    none = 0,
+    only_left = 1,
+    only_right = 2,
+    both = 3,
+};
+
 template<typename T>
 class Node
 {
@@ -16,12 +26,13 @@ private:
 
     std::unique_ptr<Node<T>> right_ { nullptr };
     std::unique_ptr<Node<T>> left_  { nullptr };
+    int depth_ { 1 };
 
 public:
 
-    std::optional<T> data { std::nullopt };
+    T data;
 
-    Node(std::optional<T> data_) : data {data_} {}
+    Node(T data_) : data {data_} {}
     template<typename... Args>
     Node(Args&&... args)
     {
@@ -54,7 +65,7 @@ public:
     {
         left_ = std::move(child);
     }
-    std::unique_ptr<Node<T>>& left(std::optional<T> data)
+    std::unique_ptr<Node<T>>& left(T data)
     {
         left_ = std::make_unique<Node<T>>(data);
         return left_;
@@ -71,6 +82,18 @@ public:
     }
     std::unique_ptr<Node<T>>& left() { return left_; }
     std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
+
+    // Return node's Parentage
+    template<typename K> friend Parentage parentage(std::unique_ptr<Node<K>>&);
+    // Check if node is a leaf (e.g. it has no children).
+    inline bool is_leaf() const { return !left_ && !right_; }
+
+    // Return node's depth
+    template<typename K> friend int depth(std::unique_ptr<Node<K>>&);
+    // Update node's depth
+    template<typename K> friend void update_depth(std::unique_ptr<Node<K>>&);
+    // Calculate node's skew
+    template<typename K> friend int skew(std::unique_ptr<Node<K>>&);
 
     // Serialization
     template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
@@ -102,6 +125,17 @@ public:
 
 };
 
+
+template<typename T>
+inline Parentage parentage(std::unique_ptr<Node<T>>& node)
+{
+    int value {
+        ( node->right_ ? 2 : 0 ) +
+        ( node->left_  ? 1 : 0 )
+    };
+    return Parentage(value);
+}
+
 // Serialization
 
 template<typename T>
@@ -111,7 +145,7 @@ void serialize(const std::unique_ptr<Node<T>>& root, std::ostream& out)
         out << "# ";  // Use "#" to denote a null node
         return;
     }
-    out << root->data.value() << " "; // Serialize current node's data
+    out << root->data << " "; // Serialize current node's data
     serialize(root->left_, out);      // Serialize left subtree
     serialize(root->right_, out);     // Serialize right subtree
 }
@@ -157,7 +191,7 @@ void print(const std::unique_ptr<Node<T>>& node, int depth = 0)
     if (node == nullptr) return;
     print(node->right_, depth + 1);
     std::cout << std::string(4 * depth, ' ');
-    if ( node->data.has_value() ) std::cout << node->data.value();
+    std::cout << node->data << " " << node->depth_;
     std::cout << std::endl;
     print(node->left_, depth + 1);
 }
@@ -215,7 +249,7 @@ void level_order(const std::unique_ptr<Node<T>>& root, F fnc)
 /*
     Every node in a full binary tree has either 0 or 2 children.
 
-    Alson known as a proper binary tree.
+    Also known as a proper binary tree.
 */
 template<typename T>
 bool is_full(const std::unique_ptr<Node<T>>& node)
@@ -242,7 +276,7 @@ bool is_complete(const std::unique_ptr<Node<T>>& node, size_t index = 0)
 }
 
 /*
-    All parents in a perfect binary tree have exactly 2 chidlren, and
+    All parents in a perfect binary tree have exactly 2 children, and
     all leaves are on the same level.
 
     Every perfect binary tree is full and perfect.
@@ -296,11 +330,30 @@ std::optional<T> search(std::unique_ptr<Node<T>>& node, T key)
     {
         Node<T>* it { q.front() };
         q.pop();
-        if ( it->data.value() == key ) return it->data;
+        if ( it->data == key ) return it->data;
         if ( it->left_ != nullptr ) q.push(it->left_.get());
         if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
     return std::nullopt;
+}
+
+template<typename T>
+inline int depth(std::unique_ptr<Node<T>>& node)
+{
+    return node ? node->depth_ : 0;
+}
+
+template<typename T>
+inline void update_depth(std::unique_ptr<Node<T>>& node)
+{
+    node->depth_ = std::max(depth(node->left()), depth(node->right())) + 1;
+}
+
+template<typename T>
+inline int skew(std::unique_ptr<Node<T>>& node)
+{
+    if ( !node ) return 0;
+    return depth(node->right_) - depth(node->left_);
 }
 
 }  // namespace tree
