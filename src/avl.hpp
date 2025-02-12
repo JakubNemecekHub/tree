@@ -188,7 +188,6 @@ public:
 
     bool remove(T key)
     {
-        if ( !root_ ) return false;
         return remove_(key, root_);
     }
 
