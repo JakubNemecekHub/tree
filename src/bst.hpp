@@ -81,10 +81,10 @@ protected:
         {
             switch ( parentage(it) )
             {
-            case Parentage::none:       it.reset();                           break;
-            case Parentage::only_right: it = std::move(it->release_right());  break;
-            case Parentage::only_left:  it = std::move(it->release_left());   break;
-            case Parentage::both:       it->data = extract_min_(it->right()); break;
+            case Degree::none:       it.reset();                           break;
+            case Degree::only_right: it = std::move(it->release_right());  break;
+            case Degree::only_left:  it = std::move(it->release_left());   break;
+            case Degree::both:       it->data = extract_min_(it->right()); break;
             default: break;
             }
             return true;

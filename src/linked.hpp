@@ -11,7 +11,7 @@
 namespace tree
 {
 
-enum class Parentage : int
+enum class Degree : int
 {
     none = 0,
     only_left = 1,
@@ -26,7 +26,7 @@ private:
 
     std::unique_ptr<Node<T>> right_ { nullptr };
     std::unique_ptr<Node<T>> left_  { nullptr };
-    int depth_ { 1 };
+    int height_ { 1 };
 
 public:
 
@@ -84,26 +84,16 @@ public:
     std::unique_ptr<Node<T>>& left() { return left_; }
     std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
 
-    // Return node's Parentage
-    template<typename K> friend Parentage parentage(std::unique_ptr<Node<K>>&);
+    // Return node's Degree
+    template<typename K> friend Degree parentage(std::unique_ptr<Node<K>>&);
     // Check if node is a leaf (e.g. it has no children).
     inline bool is_leaf() const { return !left_ && !right_; }
 
-    // Return node's depth
-    template<typename K> friend int depth(std::unique_ptr<Node<K>>&);
-    // Update node's depth
-    template<typename K> friend void update_depth(std::unique_ptr<Node<K>>&);
-    // Calculate node's skew
-    template<typename K> friend int skew(std::unique_ptr<Node<K>>&);
+    template<typename K> friend int height(std::unique_ptr<Node<K>>&);  ;       // Return node's height
+    template<typename K> friend void update_height(std::unique_ptr<Node<K>>&);  // Update node's height
+    template<typename K> friend int skew(std::unique_ptr<Node<K>>&);            // Calculate node's skew
+    template<typename K> friend size_t depth(const std::unique_ptr<Node<K>>&);  // Return tree's height
 
-    // Serialization
-    template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
-
-    // Height
-    // Depth of a node -> HOW? Is it usefull on its own?
-    // Path between two nodes?
-
-    template<typename K> friend size_t height(const std::unique_ptr<Node<K>>&);
     template<typename K> friend size_t count_nodes(const std::unique_ptr<Node<K>>&);
 
     // Traversals
@@ -124,17 +114,20 @@ public:
 
     template<typename K> friend std::optional<K> search(std::unique_ptr<Node<K>>&, K);
 
+    // Serialization
+    template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
+
 };
 
 
 template<typename T>
-inline Parentage parentage(std::unique_ptr<Node<T>>& node)
+inline Degree parentage(std::unique_ptr<Node<T>>& node)
 {
     int value {
         ( node->right_ ? 2 : 0 ) +
         ( node->left_  ? 1 : 0 )
     };
-    return Parentage(value);
+    return Degree(value);
 }
 
 // Serialization
@@ -168,13 +161,35 @@ std::unique_ptr<Node<T>> deserialize(std::ifstream& in)
     return std::move(node);
 }
 
-// Height of the tree
+// Height of a node.
 template<typename T>
-size_t height(const std::unique_ptr<Node<T>>& root)
+inline int height(std::unique_ptr<Node<T>>& node)
+{
+    return node ? node->height_ : 0;
+}
+
+// Update the height of a node.
+template<typename T>
+inline void update_height(std::unique_ptr<Node<T>>& node)
+{
+    node->height_ = std::max(height(node->left()), height(node->right())) + 1;
+}
+
+// Calculate skew of a node.
+template<typename T>
+inline int skew(std::unique_ptr<Node<T>>& node)
+{
+    if ( !node ) return 0;
+    return height(node->right_) - height(node->left_);
+}
+
+// Depth of the tree.
+template<typename T>
+size_t depth(const std::unique_ptr<Node<T>>& root)
 {
     if ( root == nullptr ) return 0;
-    size_t height_left  { height(root->left_)  };
-    size_t height_right { height(root->right_) };
+    size_t height_left  { depth(root->left_)  };
+    size_t height_right { depth(root->right_) };
     return std::max(height_left, height_right) + 1;
 }
 
@@ -192,7 +207,7 @@ void print(const std::unique_ptr<Node<T>>& node, int depth = 0)
     if (node == nullptr) return;
     print(node->right_, depth + 1);
     std::cout << std::string(4 * depth, ' ');
-    std::cout << node->data << " " << node->depth_;
+    std::cout << node->data << " " << node->height_;
     std::cout << std::endl;
     print(node->left_, depth + 1);
 }
@@ -285,10 +300,10 @@ bool is_complete(const std::unique_ptr<Node<T>>& node, size_t index = 0)
 template<typename T>
 bool is_perfect(const std::unique_ptr<Node<T>>& node, size_t level = 0)
 {
-    static size_t tree_height { height(node) };
+    static size_t tree_depth { depth(node) };
     if ( node == nullptr ) return true;
     if ( node->left_ == nullptr && node->right_ == nullptr)
-        return (tree_height == level + 1);  // We got a leaf. Check if it is at the last level.
+        return (tree_depth == level + 1);  // We got a leaf. Check if it is at the last level.
     if ( node->left_ == nullptr || node->right_ == nullptr )
         return false;                       // Internal node with only one child.
                                             // Such nodes cannot exist in a perfect tree.
@@ -311,8 +326,8 @@ bool is_balanced(const std::unique_ptr<Node<T>>& node)
         const Node<T>* it { q.front() };
         q.pop();
 
-        size_t height_left  { height(it->left_)  };
-        size_t height_right { height(it->right_) };
+        size_t height_left  { depth(it->left_)  };
+        size_t height_right { depth(it->right_) };
         if ( (height_left >= (height_right + 2)) || (height_right >= (height_left + 2)) ) return false;
 
         if ( it->left_ != nullptr )  q.push(it->left_.get());
@@ -336,25 +351,6 @@ std::optional<T> search(std::unique_ptr<Node<T>>& node, T key)
         if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
     return std::nullopt;
-}
-
-template<typename T>
-inline int depth(std::unique_ptr<Node<T>>& node)
-{
-    return node ? node->depth_ : 0;
-}
-
-template<typename T>
-inline void update_depth(std::unique_ptr<Node<T>>& node)
-{
-    node->depth_ = std::max(depth(node->left()), depth(node->right())) + 1;
-}
-
-template<typename T>
-inline int skew(std::unique_ptr<Node<T>>& node)
-{
-    if ( !node ) return 0;
-    return depth(node->right_) - depth(node->left_);
 }
 
 }  // namespace tree

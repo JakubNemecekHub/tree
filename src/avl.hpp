@@ -17,8 +17,8 @@ private:
         node->right(temp->release_left());
         std::swap(node, temp);
         node->left(std::move(temp));
-        update_depth(node->left());
-        update_depth(node);;
+        update_height(node->left());
+        update_height(node);;
     }
 
     static void rotate_right_(std::unique_ptr<Node<T>>& node)
@@ -27,25 +27,14 @@ private:
         node->left(temp->release_right());
         std::swap(node, temp);
         node->right(std::move(temp));
-        update_depth(node->right());
-        update_depth(node);
+        update_height(node->right());
+        update_height(node);
     }
 
     static void balance_(std::unique_ptr<Node<T>>& it)
     {
         if ( !it ) return;
-        // We are not directly interested in node's depth/height. What is of interest and use to us
-        // is the Balance factor of a node.
-        // Balance factor (BF) is the difference in height/depth of node's right child ath its left child.
-        // When BF ∈ {-1, 0, 1} we say that node is balanced. Otherwise the node is unbalanced and
-        // a appropriate rotation operation needs to be performed to balance our poor node.
-        // If BF < 0 node is left heavy
-        // If BF > 0 node is right heavy
-        //
-        // Other name for Balance factor is Skew. Unbalanced nodes are said to be skewed. Balanced node are still
-        // referred to as balanced.
-        //
-        update_depth(it);
+        update_height(it);
         switch (skew(it))
         {
         case 2:  // Right heavy

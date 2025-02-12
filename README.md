@@ -10,21 +10,27 @@ Two possible implementations:
 
 ## Terminology
 
-- Binary tree: The data structure itself. It's a speciall type of Tree data structure. Which itself is a special type of Graph data structure.
-- Node: The element of the tree. It holds data (either plain or with key) and has up to 2 children. In some implementations node also points back to its parent.
-- Parent
-- Child
-- Sibling: Nodes having the same parent are sibilngs.
-- Degree: Number of children of a node.
-- Edge
-- Path: A sequence of nodes n1, n2,...,nk such that ni is a parent of n(i+1) for 1 <= i <= k. **Length** of this path is k-1.
-- Ancestor and Descendant: There is a path between an ancestor and its descendants.
-- Depth: The length of a path from root to a node.
-- Height: The depth of the deepest node.
-- Level: All nodes of the same depth are said to be on the same level.
-- Internal node: A node that has at least one child.
-- Leaf node: A node with no children. Also referred to as external node.
-- Enumeration: A traversal that visits each node exactly once.
+- **Tree**:
+- **Binary tree**: The data structure itself. It's a special type of Tree data structure. Which itself is a special type of Graph data structure.
+- **Node**: The element of the tree. It holds data (either plain or with key) and has up to 2 children. In some implementations node also points back to its parent.
+- **Parent**
+- **Child**
+- **Sibling**: Nodes having the same parent are siblings.
+- **Degree**: Number of children of a node.
+- **Edge**
+- **Path**: A sequence of nodes n1, n2,...,nk such that ni is a parent of n(i+1) for 1 <= i <= k. **Length** of this path is k-1.
+- **Ancestor and Descendant**: There is a path between an ancestor and its descendants.
+- **Depth**:
+  - of node: The length of a path from root to a node.
+  - of tree: The maximum node depth.
+- **Level**: All nodes of the same depth are said to be on the same level.
+- **Height**: Property of a node, equal to number of levels of a subtree with this node as a root. E.g. node with no children (leaf) has height equal to 1. Node with only leaf children has height of 2.
+- **Skew**: The difference of the height of node's right child and it's left child. Also known as **Balance Factor**. Skew ∈ {-1, 0, 1} means node is balanced. Otherwise its skewed or unbalanced.
+  - **Left Heavy**: node with skew < 0.
+  - **Right Heavy**: node with skew > 0.
+- **Internal node**: A node that has at least one child.
+- **Leaf node**: A node with no children. Also referred to as external node.
+- **Enumeration**: A traversal that visits each node exactly once.
 
 ## Traversals
 
@@ -109,6 +115,10 @@ All parents have exactly 2 children and all leaves are on the same level. Every 
 
 Not sure if this is the correct name. But it's the data structure wee need to use to implement Huffmann Encoding. In such a tree internal nodes do not hold data, only some sort of key, and provide structure to the tree. All usable data are stored in leaf nodes.
 
+## Sources
+
+- [OpenDSA](https://opendsa-server.cs.vt.edu/ODSA/Books/CS3/html/Huffman.html)
+
 # Binary Search Tree
 
 Elements in **BST** are ordered by a **key** value. This means that BST can only stores data that can be compared using the **<** operator.
@@ -129,4 +139,15 @@ For classes that are to be stored in a tree, we can override the <=> operator. T
 
  # AVL
 
- A type of self-balancing binary search tree. Note that during the balancing act, the *binary search tree* property can be violated, if there are duplicated keys in the tree. (To demonstrate this situation, try, for example, inserting only one value into the AVL tree multiple times.) **Does this fact mean, that in-order traversal does not necessarily print ordered nodes from smallest to largest?**
+ A type of self-balancing binary search tree. Note that during the balancing act, the *binary search tree* property can be violated, if there are duplicated keys in the tree. (To demonstrate this situation, try, for example, inserting only one value into the AVL tree multiple times.) This violation, however, doesn't seam severe; It jus might happen that node's right child is equal to this node. In-order traversal still accesses elements ordered from smallest to largest.
+
+## Balancing
+
+While balancing, we are not directly interested in node's depth/height. What is of interest and use to us is the Balance factor of a node.
+Balance factor (BF) is the difference in height/depth of node's right child ath its left child.
+When BF ∈ {-1, 0, 1} we say that node is balanced. Otherwise the node is unbalanced and
+a appropriate rotation operation needs to be performed to balance our poor node.
+If BF < 0 node is left heavy
+If BF > 0 node is right heavy
+        Other name for Balance factor is Skew. Unbalanced nodes are said to be skewed. Balanced node are still
+        referred to as balanced.

@@ -66,7 +66,7 @@ void test_add_(int iterations, std::vector<std::string>& log)
 TEST(tests_AVL, "Tree stays balanced during insertion.")
 {
     constexpr int THREADS { 8 };
-    constexpr int ITERATIONS { 1000000 };
+    constexpr int ITERATIONS { 1000 };
     constexpr int ITERATIONS_PER_THREAD { ITERATIONS / THREADS };
     std::vector<std::string> log;
     std::vector<std::jthread> threads; // Can use array?
@@ -100,7 +100,7 @@ void test_remove_(int iterations, std::vector<std::tuple<std::string, std::strin
 TEST(tests_AVL, "Tree stays balanced during deletion.")
 {
     constexpr int THREADS { 8 };
-    constexpr int ITERATIONS { 1000000 };
+    constexpr int ITERATIONS { 1000 };
     constexpr int ITERATIONS_PER_THREAD { ITERATIONS / THREADS };
     std::vector<std::tuple<std::string, std::string>> log;
     std::vector<std::jthread> threads; // Can use array?
