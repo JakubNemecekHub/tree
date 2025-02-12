@@ -34,6 +34,7 @@ public:
 
     Node(T data_) : data {data_} {}
     template<typename... Args>
+    requires (sizeof...(Args) > 0)
     Node(Args&&... args)
     {
         data.emplace(std::forward<Args>(args)...);

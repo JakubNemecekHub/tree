@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include "linked.hpp"
+#include "iterator.hpp"
+
 
 namespace tree
 {
@@ -16,7 +18,7 @@ private:
     std::unique_ptr<Node<T>> root_ { nullptr };
 
     // Recursive helper member function for adding nodes.
-    void add_(T data, std::unique_ptr<Node<T>>& node)
+    static void add_(T data, std::unique_ptr<Node<T>>& node)
     {
         if ( data <= node->data )
         {
@@ -56,7 +58,7 @@ private:
     }
 
     // Recursive helper member function for search.
-    std::optional<T> search_(T key, std::unique_ptr<Node<T>>& node)
+    static std::optional<T> search_(T key, std::unique_ptr<Node<T>>& node)
     {
         if ( !node )                     return std::nullopt;
         if ( key == node->data ) return node->data;
@@ -65,70 +67,47 @@ private:
     }
 
     // Recursive helper member function for finding maximum value
-    T max_(std::unique_ptr<Node<T>>& node)
+    static T max_(std::unique_ptr<Node<T>>& node)
     {
         if ( !node->right() ) return node->data;
         else return max_(node->right());
     }
 
     // Recursive helper member function for finding minimum value
-    T min_(std::unique_ptr<Node<T>>& node)
+    static T min_(std::unique_ptr<Node<T>>& node)
     {
         if ( !node->left() ) return node->data;
         else return min_(node->left());
     }
 
     // Recursive helper member function for extracting node with maximum value
-    T extract_max_(std::unique_ptr<Node<T>>& it, std::unique_ptr<Node<T>>& its_parent)
+    static T extract_max_(std::unique_ptr<Node<T>>& it)
     {
-        if ( it->right() ) return extract_max_(it->right(), it);
-        T result { it->data };
-        if ( it == its_parent ) it = std::move(it->release_left());
-        else
+        T result;
+        if ( it->right() )
         {
-            its_parent->right(it->release_left());
-            balance_(its_parent);
+            result = extract_max_(it->right());
+            balance_(it);
+            return result;
         }
+        result = it->data;
+        it = std::move(it->release_left());
         return result;
     }
-    static std::unique_ptr<Node<T>> extract_max_node_(std::unique_ptr<Node<T>>& it, std::unique_ptr<Node<T>>& its_parent)
-    {
-        if ( it->right() ) return extract_max_node_(it->right(), it);
-        auto res { its_parent->release_right() };
-        if ( it == its_parent ) it = std::move(it->release_left());
-        else
-        {
-            its_parent->right(res->release_left());
-            balance_(its_parent);
-        }
-        return std::move(res);
-    }
 
-    T extract_min_(std::unique_ptr<Node<T>>& it, std::unique_ptr<Node<T>>& its_parent)
+    // Recursive helper member function for extracting node with maximum value
+    static T extract_min_(std::unique_ptr<Node<T>>& it)
     {
         T result;
         if ( it->left() )
         {
-            result = extract_min_(it->left(), it);
+            result = extract_min_(it->left());
             balance_(it);
             return result;
         }
         result = it->data;
         it = std::move(it->release_right());
         return result;
-    }
-    static std::unique_ptr<Node<T>> extract_min_node_(std::unique_ptr<Node<T>>& it, std::unique_ptr<Node<T>>& its_parent)
-    {
-        std::unique_ptr<Node<T>> result;
-        if ( it->left() )
-        {
-            result = extract_min_node_(it->left(), it);
-            balance_(it);
-            return result;
-        }
-        result = its_parent->release_left();
-        it = std::move(it->release_right());
-        return std::move(result);
     }
 
     static void balance_(std::unique_ptr<Node<T>>& it)
@@ -159,17 +138,17 @@ private:
         }
     }
     // Recursive helper member function to delete node by its key
-    bool remove_(T key, std::unique_ptr<Node<T>>& it, std::unique_ptr<Node<T>>& its_parent)
+    static bool remove_(T key, std::unique_ptr<Node<T>>& it)
     {
         if ( !it ) return false;  // Key not found in the tree.
         if ( key == it->data )    // Base case: do the deletion.
         {
             switch ( parentage(it) )
             {
-            case Parentage::none:       it.reset();                                        break;
-            case Parentage::only_right: it = std::move(it->release_right());               break;
-            case Parentage::only_left:  it = std::move(it->release_left());                break;
-            case Parentage::both:       it->data = extract_min_(it->right(), it->right()); break;
+            case Parentage::none:       it.reset();                           break;
+            case Parentage::only_right: it = std::move(it->release_right());  break;
+            case Parentage::only_left:  it = std::move(it->release_left());   break;
+            case Parentage::both:       it->data = extract_min_(it->right()); break;
             default: break;
             }
             return true;
@@ -177,13 +156,12 @@ private:
         else
         {
             bool res { false };
-            if ( key < it->data ) res = remove_(key, it->left(), it);
-            else if ( key > it->data ) res= remove_(key, it->right(), it);
+            if ( key < it->data ) res = remove_(key, it->left());
+            else if ( key > it->data ) res= remove_(key, it->right());
             balance_(it);
             return res;
         }
     }
-
 
 public:
 
@@ -192,15 +170,15 @@ public:
     AVL(T data)
     {
         root_ = std::make_unique<Node<T>>(data);
-        root_->depth = 1;
+        update_depth(root_);
     }
 
     std::unique_ptr<Node<T>>&  root() { return root_; };
 
     void add(T data)
     {
-        if ( root_ == nullptr ) root_ = std::make_unique<Node<T>>(data);
-        else                    add_(data, root_);
+        if ( !root_ ) root_ = std::make_unique<Node<T>>(data);
+        else          add_(data, root_);
     }
 
     std::optional<T> search(T key)
@@ -210,42 +188,42 @@ public:
 
     bool remove(T key)
     {
-        if ( root_ == nullptr ) return false;
-        return remove_(key, root_, root_);
+        if ( !root_ ) return false;
+        return remove_(key, root_);
     }
 
     std::optional<T> max()
     {
-        if ( root_ == nullptr ) return std::nullopt;
+        if ( !root_ ) return std::nullopt;
         return max_(root_);
     }
 
     std::optional<T> min()
     {
-        if ( root_ == nullptr ) return std::nullopt;
+        if ( !root_ ) return std::nullopt;
         return min_(root_);
     }
 
     std::optional<T> extract_max()
     {
-        if ( root_ == nullptr ) return std::nullopt;
-        return extract_max_(root_, root_);
+        if ( !root_ ) return std::nullopt;
+        return extract_max_(root_);
     }
     std::unique_ptr<Node<T>> extract_max_node()
     {
-        if ( root_ == nullptr ) return nullptr;
-        return extract_max_node_(root_, root_);
+        if ( !root_ ) return nullptr;
+        return std::make_unique<Node<T>>(extract_max_(root_));
     }
 
     std::optional<T> extract_min()
     {
-        if ( root_ == nullptr ) return std::nullopt;
-        return extract_min_(root_, root_);
+        if ( !root_ ) return std::nullopt;
+        return extract_min_(root_);
     }
     std::unique_ptr<Node<T>> extract_min_node()
     {
-        if ( root_ == nullptr ) return nullptr;
-        return extract_min_node_(root_, root_);
+        if ( !root_ ) return nullptr;
+        return std::make_unique<Node<T>>(extract_min_(root_));
     }
 
     // Friends
@@ -257,6 +235,16 @@ public:
     template<typename K, typename F> friend void post_order(const AVL<K>& tree, F fnc);
     template<typename K, typename F> friend void level_order(const AVL<K>& tree, F fnc);
 
+    // Iteration
+
+    InOrderIterator<T> begin()
+    {
+        return InOrderIterator<T>(root_.get());
+    }
+    InOrderIterator<T> end()
+    {
+        return InOrderIterator<T>(nullptr);
+    }
 };
 
 template<typename T>
