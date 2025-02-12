@@ -26,7 +26,7 @@ private:
 
     std::unique_ptr<Node<T>> right_ { nullptr };
     std::unique_ptr<Node<T>> left_  { nullptr };
-    int height_ { 1 };
+    size_t height_ { 1 };
 
 public:
 
@@ -89,9 +89,9 @@ public:
     // Check if node is a leaf (e.g. it has no children).
     inline bool is_leaf() const { return !left_ && !right_; }
 
-    template<typename K> friend int height(std::unique_ptr<Node<K>>&);  ;       // Return node's height
+    template<typename K> friend size_t height(std::unique_ptr<Node<K>>&);  ;       // Return node's height
     template<typename K> friend void update_height(std::unique_ptr<Node<K>>&);  // Update node's height
-    template<typename K> friend int skew(std::unique_ptr<Node<K>>&);            // Calculate node's skew
+    template<typename K> friend long long skew(std::unique_ptr<Node<K>>&);            // Calculate node's skew
     template<typename K> friend size_t depth(const std::unique_ptr<Node<K>>&);  // Return tree's height
 
     template<typename K> friend size_t count_nodes(const std::unique_ptr<Node<K>>&);
@@ -163,7 +163,7 @@ std::unique_ptr<Node<T>> deserialize(std::ifstream& in)
 
 // Height of a node.
 template<typename T>
-inline int height(std::unique_ptr<Node<T>>& node)
+inline size_t height(std::unique_ptr<Node<T>>& node)
 {
     return node ? node->height_ : 0;
 }
@@ -177,7 +177,7 @@ inline void update_height(std::unique_ptr<Node<T>>& node)
 
 // Calculate skew of a node.
 template<typename T>
-inline int skew(std::unique_ptr<Node<T>>& node)
+inline long long skew(std::unique_ptr<Node<T>>& node)
 {
     if ( !node ) return 0;
     return height(node->right_) - height(node->left_);
