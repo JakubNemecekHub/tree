@@ -35,24 +35,20 @@ private:
 
     static void rotate_left_(std::unique_ptr<Node<T>>& node)
     {
-        // node is x
-        // TO DO: come up with better name than y
-        auto y { node->release_right() };
-        node->right(y->release_left());
-        std::swap(node, y);
-        node->left(std::move(y));
+        auto temp { node->release_right() };
+        node->right(temp->release_left());
+        std::swap(node, temp);
+        node->left(std::move(temp));
         update_depth(node->left());
         update_depth(node);;
     }
 
     static void rotate_right_(std::unique_ptr<Node<T>>& node)
     {
-        // node is now y
-        // TO DO: come up with better name than x
-        auto x { node->release_left() };
-        node->left(x->release_right());
-        std::swap(node, x);
-        node->right(std::move(x));
+        auto temp { node->release_left() };
+        node->left(temp->release_right());
+        std::swap(node, temp);
+        node->right(std::move(temp));
         update_depth(node->right());
         update_depth(node);
     }
