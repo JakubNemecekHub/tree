@@ -55,7 +55,7 @@ TEST(tests_BT, "Degree of node without children.")
 {
     auto root { std::make_unique<tree::Node<int>>(7) };
     ASSERT(
-        tree::parentage(root) == tree::Degree::none,
+        tree::degree(root) == tree::Degree::none,
         "Degree of node without children should be tree::Degree::none."
     );
 }
@@ -64,7 +64,7 @@ TEST(tests_BT, "Degree of node with only left child.")
     auto root { std::make_unique<tree::Node<int>>(7) };
     root->left(3);
     ASSERT(
-        tree::parentage(root) == tree::Degree::only_left,
+        tree::degree(root) == tree::Degree::only_left,
         "Degree of node with only left child should be tree::Degree::only_left."
     );
 }
@@ -73,7 +73,7 @@ TEST(tests_BT, "Degree of node with only right child.")
     auto root { std::make_unique<tree::Node<int>>(7) };
     root->right(3);
     ASSERT(
-        tree::parentage(root) == tree::Degree::only_right,
+        tree::degree(root) == tree::Degree::only_right,
         "Degree of node with only right child should be tree::Degree::only_right."
     );
 }
@@ -83,7 +83,7 @@ TEST(tests_BT, "Degree of node with both children.")
     root->right(3);
     root->left(3);
     ASSERT(
-        tree::parentage(root) == tree::Degree::both,
+        tree::degree(root) == tree::Degree::both,
         "Degree of node with both children should be tree::Degree::both."
     );
 }

@@ -85,7 +85,7 @@ public:
     std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
 
     // Return node's Degree
-    template<typename K> friend Degree parentage(std::unique_ptr<Node<K>>&);
+    template<typename K> friend Degree degree(std::unique_ptr<Node<K>>&);
     // Check if node is a leaf (e.g. it has no children).
     inline bool is_leaf() const { return !left_ && !right_; }
 
@@ -121,7 +121,7 @@ public:
 
 
 template<typename T>
-inline Degree parentage(std::unique_ptr<Node<T>>& node)
+inline Degree degree(std::unique_ptr<Node<T>>& node)
 {
     int value {
         ( node->right_ ? 2 : 0 ) +
