@@ -84,15 +84,13 @@ public:
     std::unique_ptr<Node<T>>& left() { return left_; }
     std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
 
-    // Return node's Degree
-    template<typename K> friend Degree degree(std::unique_ptr<Node<K>>&);
-    // Check if node is a leaf (e.g. it has no children).
-    inline bool is_leaf() const { return !left_ && !right_; }
 
-    template<typename K> friend size_t height(std::unique_ptr<Node<K>>&);  ;       // Return node's height
-    template<typename K> friend void update_height(std::unique_ptr<Node<K>>&);  // Update node's height
-    template<typename K> friend long long skew(std::unique_ptr<Node<K>>&);            // Calculate node's skew
-    template<typename K> friend size_t depth(const std::unique_ptr<Node<K>>&);  // Return tree's height
+    template<typename K> friend Degree degree(const std::unique_ptr<Node<K>>&);
+
+    template<typename K> friend size_t height(const std::unique_ptr<Node<K>>&);   // Return node's height
+    template<typename K> friend void update_height(std::unique_ptr<Node<K>>&);    // Update node's height
+    template<typename K> friend long long skew(const std::unique_ptr<Node<K>>&);
+    template<typename K> friend size_t depth(const std::unique_ptr<Node<K>>&);    // Return tree's depth
 
     template<typename K> friend size_t count_nodes(const std::unique_ptr<Node<K>>&);
 
@@ -112,7 +110,7 @@ public:
     template<typename K> friend bool is_perfect(const std::unique_ptr<Node<K>>&, size_t);
     template<typename K> friend bool is_balanced(const std::unique_ptr<Node<K>>&);
 
-    template<typename K> friend std::optional<K> search(std::unique_ptr<Node<K>>&, K);
+    template<typename K> friend std::optional<K> search(const std::unique_ptr<Node<K>>&, K);
 
     // Serialization
     template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
@@ -121,7 +119,7 @@ public:
 
 
 template<typename T>
-inline Degree degree(std::unique_ptr<Node<T>>& node)
+inline Degree degree(const std::unique_ptr<Node<T>>& node)
 {
     int value {
         ( node->right_ ? 2 : 0 ) +
@@ -163,7 +161,7 @@ std::unique_ptr<Node<T>> deserialize(std::ifstream& in)
 
 // Height of a node.
 template<typename T>
-inline size_t height(std::unique_ptr<Node<T>>& node)
+inline size_t height(const std::unique_ptr<Node<T>>& node)
 {
     return node ? node->height_ : 0;
 }
@@ -177,7 +175,7 @@ inline void update_height(std::unique_ptr<Node<T>>& node)
 
 // Calculate skew of a node.
 template<typename T>
-inline long long skew(std::unique_ptr<Node<T>>& node)
+inline long long skew(const std::unique_ptr<Node<T>>& node)
 {
     if ( !node ) return 0;
     return height(node->right_) - height(node->left_);
@@ -337,7 +335,7 @@ bool is_balanced(const std::unique_ptr<Node<T>>& node)
 }
 
 template<typename T>
-std::optional<T> search(std::unique_ptr<Node<T>>& node, T key)
+std::optional<T> search(const std::unique_ptr<Node<T>>& node, T key)
 {
     if ( node == nullptr ) return std::nullopt;
     std::queue<Node<T>*> q;
