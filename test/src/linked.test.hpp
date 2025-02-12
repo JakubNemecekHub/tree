@@ -1,39 +1,89 @@
+/*
+    Test of Binary Tree
+*/
 #pragma once
 
+#include "..\lib\suite.hpp"
 #include "..\..\src\linked.hpp"
 
-/*
-    Test parentage
-*/
 
-void parentage_none()
+ts::Suite tests_BT { "Binary Tree" };
+
+TEST(tests_BT, "Empty Binary tree must be full.")
 {
-    auto root { std::make_unique<tree::Node<int>>(7) };
-    auto parentage { tree::parentage(root) };
-    if ( parentage != tree::Parentage::none ) throw std::runtime_error("Wrong parentage Parentage::none.");
+    auto root { std::make_unique<tree::Node<int>>() };
+    ASSERT
+    (
+        tree::is_full(root),
+        "Empty Binary tree is not full."
+    )
 }
 
-void parentage_both()
+TEST(tests_BT, "Empty Binary tree must be complete.")
 {
-    auto root { std::make_unique<tree::Node<int>>(7) };
-    root->left(4);
-    root->right(12);
-    auto parentage { tree::parentage(root) };
-    if ( parentage != tree::Parentage::both ) throw std::runtime_error("Wrong parentage Parentage::both.");
+    auto root { std::make_unique<tree::Node<int>>() };
+    ASSERT
+    (
+        tree::is_complete(root),
+        "Empty Binary tree is not complete."
+    )
 }
 
-void parentage_only_right()
+TEST(tests_BT, "Empty Binary tree must be perfect.")
 {
-    auto root { std::make_unique<tree::Node<int>>(7) };
-    root->right(12);
-    auto parentage { tree::parentage(root) };
-    if ( parentage != tree::Parentage::only_right ) throw std::runtime_error("Wrong parentage Parentage::only_right.");
+    auto root { std::make_unique<tree::Node<int>>() };
+    ASSERT
+    (
+        tree::is_perfect(root),
+        "Empty Binary tree is not perfect."
+    )
 }
 
-void parentage_only_left()
+TEST(tests_BT, "Empty Binary tree must be balanced.")
+{
+    auto root { std::make_unique<tree::Node<int>>() };
+    ASSERT
+    (
+        tree::is_balanced(root),
+        "Empty Binary tree is not balanced."
+    )
+}
+
+// TO DO: Test character of non-empty trees.
+
+TEST(tests_BT, "Parentage of node without children.")
 {
     auto root { std::make_unique<tree::Node<int>>(7) };
-    root->left(4);
-    auto parentage { tree::parentage(root) };
-    if ( parentage != tree::Parentage::only_left ) throw std::runtime_error("Wrong parentage Parentage::only_left.");
+    ASSERT(
+        tree::parentage(root) == tree::Parentage::none,
+        "Parentage of node without children should be tree::Parentage::none."
+    );
+}
+TEST(tests_BT, "Parentage of node with only left child.")
+{
+    auto root { std::make_unique<tree::Node<int>>(7) };
+    root->left(3);
+    ASSERT(
+        tree::parentage(root) == tree::Parentage::only_left,
+        "Parentage of node with only left child should be tree::Parentage::only_left."
+    );
+}
+TEST(tests_BT, "Parentage of node with only right child.")
+{
+    auto root { std::make_unique<tree::Node<int>>(7) };
+    root->right(3);
+    ASSERT(
+        tree::parentage(root) == tree::Parentage::only_right,
+        "Parentage of node with only right child should be tree::Parentage::only_right."
+    );
+}
+TEST(tests_BT, "Parentage of node with both children.")
+{
+    auto root { std::make_unique<tree::Node<int>>(7) };
+    root->right(3);
+    root->left(3);
+    ASSERT(
+        tree::parentage(root) == tree::Parentage::both,
+        "Parentage of node with both children should be tree::Parentage::both."
+    );
 }
