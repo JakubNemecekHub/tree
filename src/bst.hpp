@@ -12,12 +12,12 @@ namespace tree
 template<typename T>
 class BST
 {
-private:
+protected:
 
     std::unique_ptr<Node<T>> root_ { nullptr };
 
     // Recursive helper member function for adding nodes.
-    static void add_(T data, std::unique_ptr<Node<T>>& node)
+    virtual void add_(T data, std::unique_ptr<Node<T>>& node)
     {
         if ( data <= node->data )
         {
@@ -56,7 +56,7 @@ private:
     }
 
     // Recursive helper member function for extracting node with maximum value
-    static T extract_max_(std::unique_ptr<Node<T>>& it)
+    virtual T extract_max_(std::unique_ptr<Node<T>>& it)
     {
         if ( it->right() ) return extract_max_(it->right());
         T result { it->data };
@@ -65,7 +65,7 @@ private:
     }
 
     // Recursive helper member function for extracting node with minimum value
-    static T extract_min_(std::unique_ptr<Node<T>>& it)
+    virtual T extract_min_(std::unique_ptr<Node<T>>& it)
     {
         if ( it->left() ) return extract_min_(it->left());
         T result { it->data };
@@ -74,7 +74,7 @@ private:
     }
 
     // Recursive helper member function to delete node by its key
-    static bool remove_(T key, std::unique_ptr<Node<T>>& it)
+    virtual bool remove_(T key, std::unique_ptr<Node<T>>& it)
     {
         if ( !it ) return false;  // Key not found in the tree.
         if ( key == it->data )    // Base case: do the deletion.
