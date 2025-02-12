@@ -33,7 +33,7 @@ protected:
     }
 
     // Recursive helper member function for search.
-    static std::optional<T> search_(T key, std::unique_ptr<Node<T>>& node)
+    static std::optional<T> search_(T key, const std::unique_ptr<Node<T>>& node)
     {
         if ( !node )             return std::nullopt;
         if ( key == node->data ) return node->data;
@@ -42,14 +42,14 @@ protected:
     }
 
     // Recursive helper member function for finding maximum value
-    static T max_(std::unique_ptr<Node<T>>& node)
+    static T max_(const std::unique_ptr<Node<T>>& node)
     {
         if ( !node->right() ) return node->data;
         else return max_(node->right());
     }
 
     // Recursive helper member function for finding minimum value
-    static T min_(std::unique_ptr<Node<T>>& node)
+    static T min_(const std::unique_ptr<Node<T>>& node)
     {
         if ( !node->left() ) return node->data;
         else return min_(node->left());
