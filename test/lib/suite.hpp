@@ -84,12 +84,14 @@ public:
     } UNIQUE_NAME(test_registrar_);                                   \
     void UNIQUE_NAME(TestFunction_)()
 
-#define ASSERT(condition, message)                                           \
-if ( !(condition) )                                                          \
-{                                                                            \
-    std::ostringstream oss;                                                  \
-    oss << " [ASSERTION FAILED] " << #condition << " [MESSAGE] " << message; \
-    throw std::runtime_error(oss.str());                                     \
+#define ASSERT(condition, message)                            \
+if ( !(condition) )                                           \
+{                                                             \
+    std::ostringstream oss;                                   \
+    oss << ts::RED << " [ASSERTION FAILED] " << ts::RESET     \
+        << #condition                                         \
+        << ts::RED << " [MESSAGE] " << ts::RESET << message;  \
+    throw std::runtime_error(oss.str());                      \
 }
 
 }  // namespace ts
