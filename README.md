@@ -143,11 +143,20 @@ For classes that are to be stored in a tree, we can override the <=> operator. T
 
 ## Balancing
 
-While balancing, we are not directly interested in node's depth/height. What is of interest and use to us is the Balance factor of a node.
-Balance factor (BF) is the difference in height/depth of node's right child ath its left child.
-When BF ∈ {-1, 0, 1} we say that node is balanced. Otherwise the node is unbalanced and
-a appropriate rotation operation needs to be performed to balance our poor node.
-If BF < 0 node is left heavy
-If BF > 0 node is right heavy
-        Other name for Balance factor is Skew. Unbalanced nodes are said to be skewed. Balanced node are still
-        referred to as balanced.
+While balancing, we are not directly interested in node's height. What is of interest and use to us is only the Skew of a node. After insertion of new node or removal of existing node, we must check all nodes on the path we traversed and balanced those that became unbalanced by our actions. The balancing is done by one of 4 types of rotations: Left, Right, Right-Left, Left-Right.
+
+### Rotations
+
+- **Left** when node is unbalanced and right heavy (skew >= 2).
+  - **Right-Left** if node's right child is left heavy (skew <= -1) first rotate this child right.
+- **Right** when node is unbalanced and right heavy (skew <= -2).
+  - **Left-Right** if node's left child is right heavy (skew >= 1) first rotate this child left.
+
+#### Rotation Diagrams
+
+| Left | Right-Left | Right | Left-Right |
+|---|---|---|---|
+| ![Getting Started](./img/left_rotation.png) | ![Getting Started](./img/right_left_rotation.png) | ![Getting Started](./img/right_rotation.png) | ![Getting Started](./img/left_right_rotation.png) |
+| Root node **5** is unbalanced with skew +2. It's right child **6** is not left heavy (it's skew is +1), so no need for double rotation. | Root node **5** is unbalanced with skew +2. It's right child **10** is left heavy (it's skew is -1). This creates a *zig-zag* pattern. We first rotate **10** to the right and only then the root to the left. | Root node **7** is unbalanced with skew -2. It's left child **6** is not right heavy (it's skew is -1), so no need for double rotation. | Root node **10** is unbalanced with skew -2. It's left child **5** is right heavy (it's skew is +1). This creates a *zig-zag* pattern. We first rotate **5** to the left and only then the root to the right. |
+
+## Sources
