@@ -17,7 +17,7 @@
 #include <string>
 
 #include "..\lib\suite.hpp"
-#include "..\..\src\avl.hpp"
+#include "..\..\include\avl.hpp"
 
 
 ts::Suite tests_AVL { "AVL Binary Search Tree" };

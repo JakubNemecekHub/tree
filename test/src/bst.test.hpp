@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "..\lib\suite.hpp"
-#include "..\..\src\bst.hpp"
+#include "..\..\include\bst.hpp"
 
 
 ts::Suite tests_BST { "Binary Search Tree" };

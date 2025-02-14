@@ -4,7 +4,7 @@
 #pragma once
 
 #include "..\lib\suite.hpp"
-#include "..\..\src\linked.hpp"
+#include "..\..\include\linked.hpp"
 
 
 ts::Suite tests_BT { "Binary Tree" };

@@ -7,10 +7,10 @@
 #include <ranges>
 
 
-#include "linked.hpp"
-#include "bst.hpp"
-#include "avl.hpp"
-#include "types.hpp"
+#include "..\include\linked.hpp"
+#include "..\include\bst.hpp"
+#include "..\include\avl.hpp"
+#include "..\include\types.hpp"
 
 
 int main(int argc, char* argv[])
