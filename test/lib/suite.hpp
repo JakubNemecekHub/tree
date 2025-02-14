@@ -71,27 +71,64 @@ public:
 #define CONCAT_INNER(a, b) a ## b
 #define CONCAT(a, b) CONCAT_INNER(a, b)
 // Fo the indirection here see https://stackoverflow.com/questions/13301428/token-pasting-and-line/13301627#13301627
-#define UNIQUE_NAME(base) CONCAT(base, __LINE__)
+#define NAME(base) CONCAT(base, __LINE__)
 
-#define TEST(suite, message)                                          \
-    void UNIQUE_NAME(TestFunction_)();                                \
-    struct UNIQUE_NAME(TestRegistrar_)                                \
-    {                                                                 \
-        UNIQUE_NAME(TestRegistrar_)()                                 \
-        {                                                             \
-            suite.register_test(message, UNIQUE_NAME(TestFunction_)); \
-        }                                                             \
-    } UNIQUE_NAME(test_registrar_);                                   \
-    void UNIQUE_NAME(TestFunction_)()
+#define TEST(suite, message)                                   \
+    void NAME(TestFunction_)();                                \
+    struct NAME(TestRegistrar_)                                \
+    {                                                          \
+        NAME(TestRegistrar_)()                                 \
+        {                                                      \
+            suite.register_test(message, NAME(TestFunction_)); \
+        }                                                      \
+    } NAME(test_registrar_);                                   \
+    void NAME(TestFunction_)()
 
-#define ASSERT(condition, message)                            \
-if ( !(condition) )                                           \
-{                                                             \
-    std::ostringstream oss;                                   \
-    oss << ts::RED << " [ASSERTION FAILED] " << ts::RESET     \
-        << #condition                                         \
-        << ts::RED << " [MESSAGE] " << ts::RESET << message;  \
-    throw std::runtime_error(oss.str());                      \
+#define ASSERT(condition, message)                                      \
+if ( !(condition) )                                                     \
+{                                                                       \
+    std::ostringstream oss;                                             \
+    oss << "\n\t" << ts::RED << " [ASSERTION FAILED] " << ts::RESET     \
+        << #condition                                                   \
+        << "\n\t" << ts::RED << " [MESSAGE] " << ts::RESET << message;  \
+    throw std::runtime_error(oss.str());                                \
 }
+
+#define ASSERT_TRUE(condition)                                        \
+if ( !(condition) )                                                   \
+{                                                                     \
+    std::ostringstream oss;                                           \
+    oss << "\n\t" << ts::RED << "[ASSERT TRUE failed] " << ts::RESET  \
+        << #condition;                                                \
+    throw std::runtime_error(oss.str());                              \
+}
+
+#define ASSERT_FALSE(condition)                                        \
+if ( (condition) )                                                     \
+{                                                                      \
+    std::ostringstream oss;                                            \
+    oss << "\n\t" << ts::RED << "[ASSERT FALSE failed] " << ts::RESET  \
+    << #condition;                                                     \
+    throw std::runtime_error(oss.str());                               \
+}
+
+#define ASSERT_EQ(lhs, rhs)                                            \
+if ( !(lhs == rhs) )                                                   \
+{                                                                      \
+    std::ostringstream oss;                                            \
+    oss << "\n\t" << ts::RED << "[ASSERT EQUAL failed] " << ts::RESET  \
+    << #lhs << " == " << #rhs;                                         \
+    throw std::runtime_error(oss.str());                               \
+}
+
+#define EXPECT(tested, expected)                                      \
+if ( !(tested == expected) )                                          \
+{                                                                     \
+    std::ostringstream oss;                                           \
+    oss << "\n\t" << ts::RED << "[EXPECTED failed] " << ts::RESET     \
+    << "Expected \"" << expected << "\", got \"" << tested << "\".";  \
+    throw std::runtime_error(oss.str());                              \
+}
+
 
 }  // namespace ts

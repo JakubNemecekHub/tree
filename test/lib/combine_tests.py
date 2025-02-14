@@ -2,9 +2,9 @@ from pathlib import Path
 
 
 def combine_tests(headers: list[str], outfile: str) -> None:
-    with open(outfile, "w") as output:
+    with open(outfile, "w", encoding="utf-8") as output:
         for header in headers:
-            with open(header, "r") as input:
+            with open(header, "r", encoding="utf-8") as input:
                 output.write(input.read())
                 output.write("\n")
 
