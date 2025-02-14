@@ -103,6 +103,18 @@ public:
     {
         root_ = std::make_unique<Node<T>>(data);
     }
+    BST(std::vector<T> data)
+    {
+        if ( data.empty() ) BST();
+        else
+        {
+            root_ = std::make_unique<Node<T>>(data.at(0));
+            for ( int i {1}; i < data.size(); ++i )
+            {
+                add(data.at(i));
+            }
+        }
+    }
 
     std::unique_ptr<Node<T>>&  root() { return root_; };
 

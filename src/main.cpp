@@ -16,16 +16,12 @@
 int main(int argc, char* argv[])
 {
 
-    tree::AVL<int> avl { 7 };
-    avl.add(6);
-    avl.add(5);
-    avl.add(4);
-    avl.add(3);
-    avl.add(2);
+    std::vector<int> data {};
+    tree::AVL<int> search_tree { data };
+    tree::print(search_tree.root());
 
     // auto n { avl.extract_max() };
 
-    tree::print(avl.root());
 
     // tree::print(avl);
     // tree::in_order(avl, [](int data) {

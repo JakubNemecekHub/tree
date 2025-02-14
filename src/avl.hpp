@@ -81,6 +81,14 @@ public:
     AVL() {}
     AVL(Node<T> root) : BST<T>{root} {}
     AVL(T data) : BST<T>(data) {}
+    AVL(std::vector<T> data)
+    {
+        BST<T>();
+        for ( int i {0}; i < data.size(); ++i )
+        {
+            this->add(data.at(i));
+        }
+    }
 
 };
 
