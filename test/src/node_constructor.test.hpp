@@ -6,7 +6,7 @@
 #include <optional>
 #include <string>
 
-#include "..\lib\suite.hpp"
+#include "..\lib\ts\suite.hpp"
 #include "..\..\include\linked.hpp"
 #include "..\..\include\bst.hpp"
 
@@ -107,4 +107,14 @@ TEST(tests_node_constructor, "Using struct Data in Node<Data> indirectly.")
     tree::Node<Data> root { data };
     ASSERT_EQ( root.data.number, data.number )
     ASSERT_EQ( root.data.text, data.text )
+}
+
+/*
+    Move constructor
+*/
+TEST(tests_node_constructor, "Move constructor.")
+{
+    // tree::Node<int> tree_1 { 7 };
+    // tree::Node<int> tree_2 { std::move(tree_1) };
+    // ASSERT_EQ( tree_2.data, 7 )
 }

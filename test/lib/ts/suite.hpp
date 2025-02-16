@@ -117,7 +117,8 @@ if ( !(lhs == rhs) )                                                   \
 {                                                                      \
     std::ostringstream oss;                                            \
     oss << "\n\t" << ts::RED << "[ASSERT EQUAL failed] " << ts::RESET  \
-    << #lhs << " == " << #rhs;                                         \
+        << #lhs << " == " << #rhs                                      \
+        << "\n\t" << "[VALUES] " << lhs << ", and " << rhs;            \
     throw std::runtime_error(oss.str());                               \
 }
 

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include "..\lib\suite.hpp"
+#include "..\lib\ts\suite.hpp"
 #include "..\..\include\bst.hpp"
 
 

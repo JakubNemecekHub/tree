@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include "..\lib\suite.hpp"
+#include "..\lib\ts\suite.hpp"
 #include "..\..\include\linked.hpp"
 
 
