@@ -33,6 +33,9 @@ public:
 
     T data;
 
+    /*
+        Constructors
+    */
     Node(T data_) : data {data_} {}
 
     Node()
@@ -41,13 +44,36 @@ public:
     : data {} {}
 
     template<typename... Args>
-    requires (sizeof...(Args) > 0)
+    requires (
+        (sizeof...(Args) > 0) ||
+        ((sizeof...(Args) == 1) && (!std::is_same_v<std::decay_t<Args>..., Node&&>)) ||
+        ((sizeof...(Args) == 1) && (!std::is_same_v<std::decay_t<Args>..., T>))
+    )
     explicit Node(Args&&... args)
         : data {std::forward<Args>(args)...}
     {
         if constexpr ( std::is_class_v<T> )
             data = T(std::forward<Args>(args)...);
     };
+
+    Node(Node&& other)
+    {
+        right_ = std::move(other.right_);
+        left_ = std::move(other.left_);
+        data = std::move(other.data);
+    }
+
+    Node& operator= (Node&& other)
+    {
+        right_ = std::move(other.right_);
+        left_ = std::move(other.left_);
+        data = std::move(other.data);
+        return *this;
+    }
+
+    /*
+        Public member functions
+    */
 
     void right(Node* child) { right_ = std::unique_ptr<Node<T>>(child); }
     void right(std::unique_ptr<Node<T>> child)
@@ -91,6 +117,16 @@ public:
     }
     std::unique_ptr<Node<T>>& left() { return left_; }
     std::unique_ptr<Node<T>> release_left() { return std::move(left_); }
+
+    // Operators
+    auto operator<=>(const Node<T>& other) const
+    {
+        return data <=> other.data;
+    }
+    bool operator ==(const Node<T>& other) const
+    {
+        return data == other.data;
+    }
 
 
     template<typename K> friend Degree degree(const std::unique_ptr<Node<K>>&);
