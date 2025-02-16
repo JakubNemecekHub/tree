@@ -11,16 +11,6 @@
 
 ts::Suite tests_BST { "Binary Search Tree" };
 
-TEST(tests_BST, "Empty tree creation.")
-{
-    tree::BST<int> search_tree;
-    ASSERT
-    (
-        !search_tree.root(),
-        "Root of empty BST is not nullptr."
-    )
-}
-
 TEST(tests_BST, "Number of nodes in empty tree must be 0.")
 {
     tree::BST<int> search_tree;
@@ -41,14 +31,28 @@ TEST(tests_BST, "Height of empty tree must be 0.")
     )
 }
 
-TEST(tests_BST, "Non-empty tree creation.")
+TEST(tests_BST, "Empty BST must be full.")
 {
-    tree::BST<int> search_tree { 7 };
-    ASSERT
-    (
-        search_tree.root(),
-        "Root of non-empty BST is nullptr."
-    )
+    tree::BST<int> search_tree;
+    ASSERT_TRUE( tree::is_full(search_tree.root()) )
+}
+
+TEST(tests_BST, "Empty BST must be complete.")
+{
+    tree::BST<int> search_tree;
+    ASSERT_TRUE( tree::is_complete(search_tree.root()) )
+}
+
+TEST(tests_BST, "Empty BST must be perfect.")
+{
+    tree::BST<int> search_tree;
+    ASSERT_TRUE( tree::is_perfect(search_tree.root()) )
+}
+
+TEST(tests_BST, "Empty BST must be balanced.")
+{
+    tree::BST<int> search_tree;
+    ASSERT_TRUE( tree::is_balanced(search_tree.root()) )
 }
 
 TEST(tests_BST, "Adding to empty tree.")

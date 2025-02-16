@@ -23,6 +23,10 @@ struct My_Data
     {
         return key <=> other.key;
     }
+    auto operator==(const My_Data& other) const
+    {
+        return key == other.key;
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const My_Data& obj)

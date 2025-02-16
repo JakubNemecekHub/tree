@@ -97,12 +97,23 @@ protected:
 
 public:
 
+    /*
+        Constructors
+    */
     BST() {}
-    BST(Node<T> root) : root_{root} {}
+
     BST(T data)
     {
         root_ = std::make_unique<Node<T>>(data);
     }
+
+    template<typename... Args>
+    requires (sizeof...(Args) > 0)
+    explicit BST(Args&&... args)
+    {
+        root_ = std::make_unique<Node<T>>(std::forward<Args>(args)...);
+    }
+
     BST(std::vector<T> data)
     {
         if ( data.empty() ) BST();
@@ -115,6 +126,10 @@ public:
             }
         }
     }
+
+    /*
+        Public member functions
+    */
 
     std::unique_ptr<Node<T>>&  root() { return root_; };
 

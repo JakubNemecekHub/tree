@@ -78,9 +78,18 @@ private:
 
 public:
 
+    /*
+        Constructors
+    */
     AVL() {}
-    AVL(Node<T> root) : BST<T>{root} {}
+
     AVL(T data) : BST<T>(data) {}
+
+    template<typename... Args>
+    requires (sizeof...(Args) > 0)
+    explicit AVL(Args&&... args)
+        : BST<T>{std::forward<Args>(args)...} {}
+
     AVL(std::vector<T> data)
     {
         BST<T>();

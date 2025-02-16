@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <concepts>
+#include <type_traits>
 
 namespace tree
 {
@@ -33,13 +34,20 @@ public:
     T data;
 
     Node(T data_) : data {data_} {}
+
+    Node()
+    requires (std::is_default_constructible_v<T> &&
+              !std::is_trivially_default_constructible_v<T>)
+    : data {} {}
+
     template<typename... Args>
     requires (sizeof...(Args) > 0)
-    Node(Args&&... args)
+    explicit Node(Args&&... args)
+        : data {std::forward<Args>(args)...}
     {
-        data.emplace(std::forward<Args>(args)...);
+        if constexpr ( std::is_class_v<T> )
+            data = T(std::forward<Args>(args)...);
     };
-    Node() = default;
 
     void right(Node* child) { right_ = std::unique_ptr<Node<T>>(child); }
     void right(std::unique_ptr<Node<T>> child)
@@ -268,7 +276,7 @@ void level_order(const std::unique_ptr<Node<T>>& root, F fnc)
 template<typename T>
 bool is_full(const std::unique_ptr<Node<T>>& node)
 {
-  if ( node == nullptr ) return true;
+  if ( !node ) return true;
   if ( node->left_ == nullptr && node->right_ == nullptr ) return true;   // Base case
 
   if ( node->left_ && node->right_ )
@@ -278,13 +286,13 @@ bool is_full(const std::unique_ptr<Node<T>>& node)
 
 /*
     In a complete binary tree every level, except possibly the last, is completely
-    filled and all nodes at the last level are as far as possible.
+    filled and all nodes at the last level are as far left as possible.
 */
 template<typename T>
 bool is_complete(const std::unique_ptr<Node<T>>& node, size_t index = 0)
 {
+    if ( !node ) return true;
     static size_t node_count { count_nodes(node) };
-    if ( node == nullptr ) return true;
     if ( index >= node_count ) return false;
     return (is_complete(node->left_, 2 * index + 1) && is_complete(node->right_, 2 * index + 2));
 }
@@ -298,11 +306,11 @@ bool is_complete(const std::unique_ptr<Node<T>>& node, size_t index = 0)
 template<typename T>
 bool is_perfect(const std::unique_ptr<Node<T>>& node, size_t level = 0)
 {
+    if ( !node ) return true;
     static size_t tree_depth { depth(node) };
-    if ( node == nullptr ) return true;
-    if ( node->left_ == nullptr && node->right_ == nullptr)
+    if ( node->left_ == nullptr && node->right_ == nullptr)  // TO DO: Use Degree enum
         return (tree_depth == level + 1);  // We got a leaf. Check if it is at the last level.
-    if ( node->left_ == nullptr || node->right_ == nullptr )
+    if ( node->left_ == nullptr || node->right_ == nullptr ) // TO DO: Use Degree enum
         return false;                       // Internal node with only one child.
                                             // Such nodes cannot exist in a perfect tree.
     // If we have a internal node with both children, we must check both its subtrees.
@@ -316,7 +324,7 @@ bool is_perfect(const std::unique_ptr<Node<T>>& node, size_t level = 0)
 template<typename T>
 bool is_balanced(const std::unique_ptr<Node<T>>& node)
 {
-    if ( node == nullptr ) return true;
+    if ( !node ) return true;
     std::queue<const Node<T>*> q;
     q.push(node.get());
     while ( !q.empty() )
