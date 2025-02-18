@@ -78,6 +78,10 @@ public:
     {
         right_ = std::move(child);
     }
+    void right(Node<T>&& child)
+    {
+        right_ = std::make_unique<Node<T>>(std::forward<Node<T>&&>(child));
+    }
     std::unique_ptr<Node<T>>& right(T data)
     {
         right_ = std::make_unique<Node<T>>(data);
@@ -97,6 +101,10 @@ public:
     void left(std::unique_ptr<Node<T>> child)
     {
         left_ = std::move(child);
+    }
+    void left(Node<T>&& child)
+    {
+        left_ = std::make_unique<Node<T>>(std::forward<Node<T>&&>(child));
     }
     std::unique_ptr<Node<T>>& left(T data)
     {

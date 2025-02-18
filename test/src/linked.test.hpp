@@ -116,3 +116,15 @@ TEST(tests_BT, "Balanced Binary tree.")
     left_child->right(5);
     ASSERT_TRUE ( tree::is_balanced(root) )
 }
+
+/*
+    Children
+*/
+TEST(tests_BT, "Add children.")
+{
+    tree::Node<int> root { 7 };
+    tree::Node<int> left { 6 };
+    tree::Node<int> right { 8 };
+    root.left(std::move(left));
+    root.right(std::move(right));
+}
