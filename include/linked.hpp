@@ -134,8 +134,11 @@ public:
         return data == other.data;
     }
 
-
-    template<typename K> friend Degree degree(const std::unique_ptr<Node<K>>&);
+    inline Degree degree() const
+    {
+        int value { ( right_ ? 2 : 0 ) + ( left_  ? 1 : 0 ) };
+        return Degree(value);
+    }
 
     template<typename K> friend size_t height(const std::unique_ptr<Node<K>>&);   // Return node's height
     template<typename K> friend void update_height(std::unique_ptr<Node<K>>&);    // Update node's height
@@ -166,17 +169,6 @@ public:
     template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
 
 };
-
-
-template<typename T>
-inline Degree degree(const std::unique_ptr<Node<T>>& node)
-{
-    int value {
-        ( node->right_ ? 2 : 0 ) +
-        ( node->left_  ? 1 : 0 )
-    };
-    return Degree(value);
-}
 
 // Serialization
 

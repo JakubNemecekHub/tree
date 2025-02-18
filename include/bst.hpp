@@ -79,7 +79,7 @@ protected:
         if ( !it ) return false;  // Key not found in the tree.
         if ( key == it->data )    // Base case: do the deletion.
         {
-            switch ( degree(it) )
+            switch ( it->degree() )
             {
             case Degree::none:       it.reset();                           break;
             case Degree::only_right: it = std::move(it->release_right());  break;
