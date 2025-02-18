@@ -36,7 +36,7 @@ public:
     /*
         Constructors
     */
-    Node(T data_) : data {data_} {}
+    explicit Node(T data_) : data {data_} {}
 
     Node()
     requires (std::is_default_constructible_v<T> &&
@@ -44,17 +44,15 @@ public:
     : data {} {}
 
     template<typename... Args>
-    requires (
-        (sizeof...(Args) > 0) ||
-        ((sizeof...(Args) == 1) && (!std::is_same_v<std::decay_t<Args>..., Node&&>)) ||
-        ((sizeof...(Args) == 1) && (!std::is_same_v<std::decay_t<Args>..., T>))
-    )
     explicit Node(Args&&... args)
         : data {std::forward<Args>(args)...}
     {
         if constexpr ( std::is_class_v<T> )
             data = T(std::forward<Args>(args)...);
     };
+
+    Node(const Node& other) = delete;
+    Node& operator=(const Node& other) = delete;
 
     Node(Node&& other)
     {

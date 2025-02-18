@@ -114,7 +114,7 @@ TEST(tests_node_constructor, "Using struct Data in Node<Data> indirectly.")
 */
 TEST(tests_node_constructor, "Move constructor.")
 {
-    // tree::Node<int> tree_1 { 7 };
-    // tree::Node<int> tree_2 { std::move(tree_1) };
-    // ASSERT_EQ( tree_2.data, 7 )
+    tree::Node<int> tree_1 { 7 };
+    tree::Node<int> tree_2 { std::move(tree_1) };
+    ASSERT_EQ( tree_2.data, 7 )
 }
