@@ -73,11 +73,7 @@ TEST(tests_AVL, "Tree stays balanced during insertion.")
     for ( size_t i {0}; i < THREADS; ++i )
         threads.emplace_back(test_add_, ITERATIONS_PER_THREAD, std::ref(log));
     // Log the log vector into a file
-    ASSERT
-    (
-        log.empty(),
-        "Balance broken during insertion."
-    )
+    ASSERT_TRUE ( log.empty() )
 }
 
 void test_remove_(int iterations, std::vector<std::tuple<std::string, std::string>>& log)
@@ -107,11 +103,7 @@ TEST(tests_AVL, "Tree stays balanced during deletion.")
     for ( size_t i {0}; i < THREADS; ++i )
         threads.emplace_back(test_remove_, ITERATIONS_PER_THREAD, std::ref(log));
     // Log the log vector into a file
-    ASSERT
-    (
-        log.empty(),
-        "Balance broken during deletion."
-    )
+    ASSERT_TRUE( log.empty() )
 }
 
 tree::AVL<int> set_up_avl()
@@ -131,11 +123,7 @@ void bst_property_(tree::AVL<int>& search_tree)
     int value { INT_MIN };
     for ( auto it {search_tree.begin()}; it != search_tree.end(); ++it)
     {
-        ASSERT
-        (
-            *it >= value,
-            "Key in AVL not in order."
-        )
+        ASSERT_TRUE( *it >= value )
         value = *it;
     }
 }
@@ -165,22 +153,14 @@ TEST(tests_AVL, "Extracting maximum preserves balance.")
 {
     auto search_tree { set_up_avl() };
     search_tree.extract_max();
-    ASSERT
-    (
-        tree::is_balanced(search_tree.root()),
-        "extract_max doesn't preserves balance."
-    )
+    ASSERT_TRUE( tree::is_balanced(search_tree.root()) )
 }
 
 TEST(tests_AVL, "Extracting minimum preserves balance.")
 {
     auto search_tree { set_up_avl() };
     search_tree.extract_min();
-    ASSERT
-    (
-        tree::is_balanced(search_tree.root()),
-        "extract_min doesn't preserves balance."
-    )
+    ASSERT_TRUE( tree::is_balanced(search_tree.root()) )
 }
 
 /*
@@ -190,20 +170,12 @@ TEST(tests_AVL, "Extracting maximum node preserves balance.")
 {
     auto search_tree { set_up_avl() };
     search_tree.extract_max_node();
-    ASSERT
-    (
-        tree::is_balanced(search_tree.root()),
-        "extract_max_node doesn't preserves balance."
-    )
+    ASSERT_TRUE( tree::is_balanced(search_tree.root()) )
 }
 
 TEST(tests_AVL, "Extracting minimum node preserves balance.")
 {
     auto search_tree { set_up_avl() };
     search_tree.extract_min_node();
-    ASSERT
-    (
-        tree::is_balanced(search_tree.root()),
-        "extract_min_node doesn't preserves balance."
-    )
+    ASSERT_TRUE( tree::is_balanced(search_tree.root()) )
 }

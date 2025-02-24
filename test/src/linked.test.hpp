@@ -12,38 +12,26 @@ ts::Suite tests_BT { "Binary Tree" };
 TEST(tests_BT, "Degree of node without children.")
 {
     tree::Node<int> root { 7 };
-    ASSERT(
-        root.degree() == tree::Degree::none,
-        "Degree of node without children should be tree::Degree::none."
-    );
+    ASSERT_EQ_M( root.degree(), tree::Degree::none )
 }
 TEST(tests_BT, "Degree of node with only left child.")
 {
     tree::Node<int> root { 7 };
     root.left(3);
-    ASSERT(
-        root.degree() == tree::Degree::only_left,
-        "Degree of node with only left child should be tree::Degree::only_left."
-    );
+    ASSERT_EQ_M( root.degree(), tree::Degree::only_left )
 }
 TEST(tests_BT, "Degree of node with only right child.")
 {
     tree::Node<int> root { 7 };
     root.right(3);
-    ASSERT(
-        root.degree() == tree::Degree::only_right,
-        "Degree of node with only right child should be tree::Degree::only_right."
-    );
+    ASSERT_EQ_M( root.degree(), tree::Degree::only_right )
 }
 TEST(tests_BT, "Degree of node with both children.")
 {
     tree::Node<int> root { 7 };
     root.right(3);
     root.left(3);
-    ASSERT(
-        root.degree() == tree::Degree::both,
-        "Degree of node with both children should be tree::Degree::both."
-    );
+    ASSERT_EQ_M( root.degree(), tree::Degree::both )
 }
 
 /*
