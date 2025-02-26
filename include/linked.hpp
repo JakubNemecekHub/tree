@@ -49,7 +49,7 @@ public:
     {
         if constexpr ( std::is_class_v<T> )
             data = T(std::forward<Args>(args)...);
-    };
+    }
 
     Node(const Node& other) = delete;
     Node& operator=(const Node& other) = delete;
