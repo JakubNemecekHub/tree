@@ -82,9 +82,9 @@ public:
     {
         right_ = std::make_unique<Node<T>>(std::forward<Node<T>&&>(child));
     }
-    std::unique_ptr<Node<T>>& right(T data)
+    std::unique_ptr<Node<T>>& right(T new_data)
     {
-        right_ = std::make_unique<Node<T>>(data);
+        right_ = std::make_unique<Node<T>>(new_data);
         return right_;
     }
     template<typename... Args>
@@ -106,9 +106,9 @@ public:
     {
         left_ = std::make_unique<Node<T>>(std::forward<Node<T>&&>(child));
     }
-    std::unique_ptr<Node<T>>& left(T data)
+    std::unique_ptr<Node<T>>& left(T new_data)
     {
-        left_ = std::make_unique<Node<T>>(data);
+        left_ = std::make_unique<Node<T>>(new_data);
         return left_;
     }
     template<typename... Args>
