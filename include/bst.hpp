@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "linked.hpp"
-#include "iterator.hpp"
 
 namespace tree
 {
