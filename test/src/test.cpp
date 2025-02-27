@@ -13,6 +13,7 @@ int main()
     tester.add(tests_bst_constructor, "tests_bst_constructor");
     tester.add(tests_avl_constructor, "tests_avl_constructor");
     tester.add(tests_containers, "tests_containers");
+    tester.add(tests_comparison, "tests_comparison");
     tester.run();
 
     return 0;

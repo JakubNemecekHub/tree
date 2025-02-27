@@ -241,6 +241,9 @@ public:
 
     template<typename K> friend std::optional<K> search(const std::unique_ptr<Node<K>>&, K);
 
+    // Complete comparison
+    template<typename K> friend bool compare(const std::unique_ptr<Node<K>>& lhs, const std::unique_ptr<Node<K>>& rhs);
+
     // Serialization
     template<typename K> friend void serialize(const std::unique_ptr<Node<K>>&, std::ostream&);
 
@@ -478,6 +481,18 @@ std::optional<T> search(const std::unique_ptr<Node<T>>& node, T key)
         if ( it->right_ != nullptr ) q.push(it->right_.get());
     }
     return std::nullopt;
+}
+
+template<typename T>
+bool compare(const std::unique_ptr<Node<T>>& lhs, const std::unique_ptr<Node<T>>& rhs)
+{
+    if ( !lhs && !rhs ) return true;
+    if ( (*lhs != *rhs) || (lhs->degree() != rhs->degree()) ) return false;
+    bool result { true };
+    result = compare(lhs->left(), rhs->left());
+    if ( !result ) return false;
+    result = compare(lhs->right(), rhs->right());
+    return result;
 }
 
 }  // namespace tree
