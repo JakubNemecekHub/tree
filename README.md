@@ -160,3 +160,12 @@ While balancing, we are not directly interested in node's height. What is of int
 | Root node **5** is unbalanced with skew +2. It's right child **6** is not left heavy (it's skew is +1), so no need for double rotation. | Root node **5** is unbalanced with skew +2. It's right child **10** is left heavy (it's skew is -1). This creates a *zig-zag* pattern. We first rotate **10** to the right and only then the root to the left. | Root node **7** is unbalanced with skew -2. It's left child **6** is not right heavy (it's skew is -1), so no need for double rotation. | Root node **10** is unbalanced with skew -2. It's left child **5** is right heavy (it's skew is +1). This creates a *zig-zag* pattern. We first rotate **5** to the left and only then the root to the right. |
 
 ## Sources
+
+
+# Note on use of std::unique_ptr
+
+Using std::unique_ptr<Node> for the children proved to be challenging. It's not even clear if it is a better approach than raw pointers and manual memory management. WE haven't even tested for memory leaks!
+
+The problem we are now facing is a sort of "random iteration" through the tree in our *huff* program. We need to be able to have a variable that points to a specific node in the tree. And we must be able to assign a different node in the tree to this node. But the ownership must stay unchanged.
+
+Can this be done using raw pointers?
